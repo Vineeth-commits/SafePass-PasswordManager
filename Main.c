@@ -26,16 +26,19 @@ struct password *storePassword(struct password *s, char password[])
     strcpy(s->passwordAttempt,password);
     return s;
 }
-int login()
+int login(FILE *user,FILE *passwd)
 {
     printf("Hey you need to enter your username and password \nUsername: ");
     char name[20];
     scanf("%[^\n]%*c",name);
-    if(strcmp(name,"Vineeth")==0)
+    char line[20]; 
+    fgets( line, 20, user);
+    printf("%s",line);
+    if(strcmp(name,line)==0)
     {
         printf("Enter your password: ");
         char password[50];
-        scanf("%s",password);
+        scanf("%[^\n]%*c",password);
         if(strcmp(password,"afjdlsk")==0)
         {
             return 1;
@@ -55,7 +58,15 @@ int login()
 }
 int main()
 {
-    if(login()==1)
+    FILE *user = fopen("users.txt","r");
+    FILE *passwd = fopen("passwds.txt","r");
+    if(user==NULL||passwd==NULL)
+    {
+        printf("Error! Could not open file\n"); 
+        exit(-1);
+    }
+
+    if(login(user,passwd)==1)
     {
         printf("Login Successful");
         struct username *user1 = storeUsername(user1,"Vineeth");
