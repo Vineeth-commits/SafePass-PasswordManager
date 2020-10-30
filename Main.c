@@ -1,10 +1,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#define Buffer_size 100 
 
 struct username
 {
     int nameLength;
+    int userID;
     char userNameAttempt[];
 };
 struct username *storeUsername(struct username *s, char username[])
@@ -28,59 +30,102 @@ struct password *storePassword(struct password *s, char password[])
 }
 int login(FILE *userFile,FILE *passwdFile)
 {
-    printf("Hey you need to enter your username and password \nUsername: ");
-    char nameEntered[20];
-    char passwdEntered[30];
+    printf("Hey, you need to enter your username and password\nUsername: ");
+    char nameEntered[Buffer_size];
+    char passwdEntered[Buffer_size];
+    int userCounter = 1;
+    int passwordCounter = 1;
     scanf("%[^\n]%*c",nameEntered);
-    char nameCompare[20]; 
-    char passwdCompare[20];
-    fgets(nameCompare, 20, userFile);
-    nameCompare[strlen(nameEntered)] = '\0';
-    if(strcmp(nameEntered,nameCompare)==0)
+    char nameCompare[Buffer_size]; 
+    char passwdCompare[Buffer_size];
+    while(fgets(nameCompare, Buffer_size, userFile)!= NULL )
     {
-        printf("Enter your password: ");
-        scanf("%[^\n]%*c",passwdEntered);
-        fgets(passwdCompare, 20, passwdFile);
-        passwdCompare[strlen(passwdEntered)] = '\0';
-        if(strcmp(passwdEntered,passwdCompare)==0)
+        nameCompare[strlen(nameEntered)] = '\0';
+        if(strcmp(nameEntered,nameCompare)==0)
         {
-            return 1;
+            printf("Enter your password: ");
+            scanf("%[^\n]%*c",passwdEntered);
+            while(fgets(passwdCompare, Buffer_size, passwdFile)!= NULL)
+            {
+                passwdCompare[strlen(passwdEntered)] = '\0';
+                if((strcmp(passwdEntered,passwdCompare)==0)&&(passwordCounter==userCounter))
+                {
+                    return passwordCounter;
+                }
+                passwordCounter++;
+            }
         }
-        else
-        {
-            printf("Password Incorrect \n");
-            return -1;
-        }
+        userCounter++;
     }
-    else
-    {
-    printf("Username Incorrect \n");
-    return -1;
-    }
-    
+    printf("Username and/or Password incorrect\n");
+    return -1; 
 }
+
+// void newVault(char *userName[])
+// {
+
+// }
+
 int main()
 {
+    int choice =1;
+    char newUserName[Buffer_size];
+    char newUserNameCompare[Buffer_size];
+    char username[Buffer_size];
+    char password[Buffer_size];
+    int userID;
     FILE *userFile = fopen("users.txt","r");
-    FILE *passwdFile = fopen("passwds.txt","r");
-    char username[50];
-    char password[50];
-    if(userFile==NULL||passwdFile==NULL)
-    {
-        printf("Error! Could not open file\n"); 
-        exit(-1);
-    }
+    FILE *passwdFile= fopen("passwds.txt","r");
+    returnChoice:
+    printf("Select the options below:\n");
+    printf("Press 1 to login in to your vault\n");
+    printf("Press 2 to create a new vault\n");
+    switch(choice){
+        case 1:
+                freopen("users.txt","r",userFile);
+                freopen("passwds.txt","r",passwdFile);
+                if(userFile==NULL||passwdFile==NULL)
+                {
+                    printf("Error! Could not open file\n"); 
+                    printf("Inspection to the file is needed");
+                    exit(-1);
+                }
+                userID = login(userFile,passwdFile);
+                if(userID>=1)
+                {
+                    printf("Login Successful");
+                    fgets( username, Buffer_size, userFile);
+                    fgets( password, Buffer_size, userFile);
+                    struct username *user = storeUsername(user,username);
+                    struct password *passwd = storePassword(passwd,password);
+                    user->userID = userID;
+                    printf("");
 
-    if(login(userFile,passwdFile)==1)
-    {
-        printf("Login Successful");
-        fgets( username, 50, userFile);
-        fgets( password, 50, userFile);
-        struct username *user1 = storeUsername(user1,username);
-        struct password *pass1 = storePassword(pass1,password);
-    }
-    else
-    {
-        printf("Login Failed");
-    }
+                }
+                else
+                {
+                    printf("Login Failed\n");
+                    printf("Try again\n");
+                    goto returnChoice;
+                }
+                
+                fclose(userFile);
+                fclose(passwdFile);
+                break;
+        
+        case 2:
+                reUsername:
+                printf("Enter your new Username to create a vault:\nUsername: ");
+                scanf("%[^\n]%*c",newUserName);
+                while(fgets(newUserNameCompare, Buffer_size, userFile)!= NULL)
+                {
+                    newUserNameCompare[strlen(newUserName)] = '\0';
+                    if(strcmp(newUserNameCompare, newUserName)==0)
+                    {
+                        printf("Username is already taken\n");
+                        printf("Enter a different username\n");
+                        goto reUsername;
+                    }
+                }
+    } 
 }
