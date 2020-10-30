@@ -26,20 +26,23 @@ struct password *storePassword(struct password *s, char password[])
     strcpy(s->passwordAttempt,password);
     return s;
 }
-int login(FILE *user,FILE *passwd)
+int login(FILE *userFile,FILE *passwdFile)
 {
     printf("Hey you need to enter your username and password \nUsername: ");
-    char name[20];
-    scanf("%[^\n]%*c",name);
-    char line[20]; 
-    fgets( line, 20, user);
-    printf("%s",line);
-    if(strcmp(name,line)==0)
+    char nameEntered[20];
+    char passwdEntered[30];
+    scanf("%[^\n]%*c",nameEntered);
+    char nameCompare[20]; 
+    char passwdCompare[20];
+    fgets(nameCompare, 20, userFile);
+    nameCompare[strlen(nameEntered)] = '\0';
+    if(strcmp(nameEntered,nameCompare)==0)
     {
         printf("Enter your password: ");
-        char password[50];
-        scanf("%[^\n]%*c",password);
-        if(strcmp(password,"afjdlsk")==0)
+        scanf("%[^\n]%*c",passwdEntered);
+        fgets(passwdCompare, 20, passwdFile);
+        passwdCompare[strlen(passwdEntered)] = '\0';
+        if(strcmp(passwdEntered,passwdCompare)==0)
         {
             return 1;
         }
@@ -58,19 +61,23 @@ int login(FILE *user,FILE *passwd)
 }
 int main()
 {
-    FILE *user = fopen("users.txt","r");
-    FILE *passwd = fopen("passwds.txt","r");
-    if(user==NULL||passwd==NULL)
+    FILE *userFile = fopen("users.txt","r");
+    FILE *passwdFile = fopen("passwds.txt","r");
+    char username[50];
+    char password[50];
+    if(userFile==NULL||passwdFile==NULL)
     {
         printf("Error! Could not open file\n"); 
         exit(-1);
     }
 
-    if(login(user,passwd)==1)
+    if(login(userFile,passwdFile)==1)
     {
         printf("Login Successful");
-        struct username *user1 = storeUsername(user1,"Vineeth");
-        struct password *pass1 = storePassword(pass1,"afjdlsk");
+        fgets( username, 50, userFile);
+        fgets( password, 50, userFile);
+        struct username *user1 = storeUsername(user1,username);
+        struct password *pass1 = storePassword(pass1,password);
     }
     else
     {
