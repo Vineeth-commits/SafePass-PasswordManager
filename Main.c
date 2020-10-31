@@ -61,14 +61,30 @@ int login(FILE *userFile,FILE *passwdFile)
     return -1; 
 }
 
-// void newVault(char *userName[])
-// {
-
-// }
+void newVault(char dataToAppend[])
+{
+    char dataToAppendPasswd[Buffer_size];
+    FILE *appendUser = fopen("users.txt", "a");
+    FILE *appendPasswd = fopen("passwds.txt","a");
+    if (appendUser == NULL) 
+    {
+        printf("Unable to open the file\n");
+        printf("Inspection of the file is needed\n");
+        exit(-1);
+    }
+    dataToAppend[strlen(dataToAppend)] ='\n';
+    fputs(dataToAppend, appendUser);
+    printf("Enter the password:\n");
+    fflush(stdin);
+    fgets(dataToAppendPasswd,Buffer_size,stdin);
+    fputs(dataToAppendPasswd,appendPasswd);
+    printf("New vault has been created\n");
+    printf("Login again to input entries into your vault\n");
+}
 
 int main()
 {
-    int choice =1;
+    int choice=2;
     char newUserName[Buffer_size];
     char newUserNameCompare[Buffer_size];
     char username[Buffer_size];
@@ -87,7 +103,7 @@ int main()
                 if(userFile==NULL||passwdFile==NULL)
                 {
                     printf("Error! Could not open file\n"); 
-                    printf("Inspection to the file is needed");
+                    printf("Inspection of the file is needed\n");
                     exit(-1);
                 }
                 userID = login(userFile,passwdFile);
@@ -127,5 +143,6 @@ int main()
                         goto reUsername;
                     }
                 }
+                newVault(newUserName);
     } 
 }
