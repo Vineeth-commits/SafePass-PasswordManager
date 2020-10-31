@@ -9,6 +9,100 @@ struct username
     int userID;
     char userNameAttempt[];
 };
+struct password
+{
+    int passwordLength;
+    char passwordAttempt[];
+};
+
+void encryption(char fileName[])
+{
+    char ch;
+    FILE *fileOrg = fopen(fileName,"r");
+    FILE *fileTemp = fopen("temp.txt","w");
+    if((fileOrg == NULL)||(fileTemp == NULL))
+    {
+        printf("Unable to open the file\n");
+        printf("Inspection of the file is needed\n");
+        exit(-1);
+    }
+    ch = fgetc(fileOrg);
+    while(ch != EOF)
+    {
+        ch = ch+100;
+        fputc(ch, fileTemp);
+        ch = fgetc(fileOrg);
+    }
+    fclose(fileOrg);
+    fclose(fileTemp);
+    fileOrg = fopen(fileName, "w");
+    if(fileOrg == NULL)
+    {
+        printf("Unable to open the file\n");
+        printf("Inspection of the file is needed\n");
+        exit(-1);
+    }
+    fileTemp = fopen("temp.txt", "r");
+    if(fileTemp == NULL)
+    {
+        printf("Unable to open the file\n");
+        printf("Inspection of the file is needed\n");
+        exit(-1);
+    }
+    ch = fgetc(fileTemp);
+    while(ch != EOF)
+    {
+        ch = fputc(ch, fileOrg);
+        ch = fgetc(fileTemp);
+    }
+    fclose(fileOrg);
+    fclose(fileTemp);
+}
+
+void decryption(char fileName[])
+{
+    char ch;
+    FILE *fileOrg = fopen(fileName,"r");
+    FILE *fileTemp = fopen("temp.txt","w");
+    if((fileOrg == NULL)||(fileTemp == NULL))
+    {
+        printf("Unable to open the file\n");
+        printf("Inspection of the file is needed\n");
+        exit(-1);
+    }
+    ch = fgetc(fileOrg);
+    while(ch != EOF)
+    {
+        ch = ch-100;
+        fputc(ch,fileTemp);
+        ch = fgetc(fileOrg);
+    }
+    fclose(fileOrg);
+    fclose(fileTemp);
+    fileOrg = fopen(fileName, "w");
+    if(fileOrg == NULL)
+    {
+        printf("Unable to open the file\n");
+        printf("Inspection of the file is needed\n");
+        exit(-1);
+    }
+    fileTemp = fopen("temp.txt", "r");
+    if(fileTemp == NULL)
+    {
+        printf("Unable to open the file\n");
+        printf("Inspection of the file is needed\n");
+        exit(-1);
+    }
+    ch = fgetc(fileTemp);
+    while(ch != EOF)
+    {
+        ch = fputc(ch, fileOrg);
+        ch = fgetc(fileTemp);
+    }
+    fclose(fileOrg);
+    fclose(fileTemp);
+}
+
 struct username *storeUsername(struct username *s, char username[])
 {
     s = malloc(sizeof(*s) + sizeof(char) * strlen(username));
@@ -16,11 +110,7 @@ struct username *storeUsername(struct username *s, char username[])
     strcpy(s->userNameAttempt, username);
     return s;
 }
-struct password
-{
-    int passwordLength;
-    char passwordAttempt[];
-};
+
 struct password *storePassword(struct password *s, char password[])
 {
     s = malloc(sizeof(*s) + sizeof(char) * strlen(password));
@@ -28,6 +118,7 @@ struct password *storePassword(struct password *s, char password[])
     strcpy(s->passwordAttempt,password);
     return s;
 }
+
 int login(FILE *userFile,FILE *passwdFile)
 {
     printf("Hey, you need to enter your username and password\nUsername: ");
@@ -57,6 +148,8 @@ int login(FILE *userFile,FILE *passwdFile)
         }
         userCounter++;
     }
+    fclose(userFile);
+    fclose(passwdFile);
     printf("Username and/or Password incorrect\n");
     return -1; 
 }
@@ -80,11 +173,13 @@ void newVault(char dataToAppend[])
     fputs(dataToAppendPasswd,appendPasswd);
     printf("New vault has been created\n");
     printf("Login again to input entries into your vault\n");
+    fclose(appendUser);
+    fclose(appendPasswd);
 }
 
 int main()
 {
-    int choice=2;
+    int choice=1;
     char newUserName[Buffer_size];
     char newUserNameCompare[Buffer_size];
     char username[Buffer_size];
@@ -92,6 +187,8 @@ int main()
     int userID;
     FILE *userFile = fopen("users.txt","r");
     FILE *passwdFile= fopen("passwds.txt","r");
+    decryption("users.txt");
+    decryption("passwds.txt");
     returnChoice:
     printf("Select the options below:\n");
     printf("Press 1 to login in to your vault\n");
@@ -130,6 +227,8 @@ int main()
                 break;
         
         case 2:
+                freopen("users.txt","r",userFile);
+                freopen("passwds.txt","r",passwdFile);
                 reUsername:
                 printf("Enter your new Username to create a vault:\nUsername: ");
                 scanf("%[^\n]%*c",newUserName);
@@ -144,5 +243,10 @@ int main()
                     }
                 }
                 newVault(newUserName);
-    } 
+                fclose(userFile);
+                fclose(passwdFile);
+                break;
+    }
+    encryption("users.txt");
+    encryption("passwds.txt");
 }
