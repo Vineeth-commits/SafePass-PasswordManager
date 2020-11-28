@@ -1,6 +1,7 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 #define Buffer_size 100 
 
 struct username
@@ -9,11 +10,65 @@ struct username
     int userID;
     char userNameAttempt[];
 };
+
 struct password
 {
     int passwordLength;
     char passwordAttempt[];
 };
+
+struct Node
+{
+    char data[Buffer_size];
+    struct Node *next;
+}*first=NULL;
+
+void createNode(char logData[])
+{
+    struct Node *t,*last;
+    first = (struct Node *)malloc(sizeof(struct Node));
+    strcpy(first->data, logData);
+    first->next=NULL;
+    last=first;
+}
+
+void displayNode(struct Node *p)
+{
+    FILE *appendUser = fopen("./records-and-logs/loginLogs.txt", "a");
+    while(p!=NULL)
+    {
+        // p->data[strlen(p->data)] = '\n';
+        fputs(p->data,appendUser);
+        p=p->next;
+    }
+    char lineBreak[] = "\n"; 
+    fputs(lineBreak,appendUser);
+    fclose(appendUser);
+}
+
+int countNode(struct Node *p)
+{
+    int counter=0;
+    while(p!=NULL)
+    {
+        counter++;
+        p=p->next;
+    }
+    return counter;
+}
+
+void insertionNode(struct Node *p,char dataLog[])
+{
+    struct Node *t, *last;
+    int index = countNode(p);
+    printf("%d",index);
+    t = (struct Node *)malloc(sizeof(struct Node));
+    strcpy(t->data, dataLog);
+    t->next=NULL;
+    last = first;
+    last->next = t;
+    last = t;
+}
 
 void encryption(char fileName[])
 {
@@ -119,6 +174,15 @@ struct password *storePassword(struct password *s, char password[])
     return s;
 }
 
+void storeLog(char username [], char password[], int userID)
+{
+    struct username *user = storeUsername(user,username);
+    struct password *passwd = storePassword(passwd,password);
+    user->userID = userID;
+    printf("Login Successful");
+    printf("\n Welcome %s",user->userNameAttempt);
+    insertionNode(first,username);
+}
 int login(FILE *userFile,FILE *passwdFile)
 {
     printf("Hey, you need to enter your username and password\nUsername: ");
@@ -141,6 +205,7 @@ int login(FILE *userFile,FILE *passwdFile)
                 passwdCompare[strlen(passwdEntered)] = '\0';
                 if((strcmp(passwdEntered,passwdCompare)==0)&&(passwordCounter==userCounter))
                 {
+                    storeLog(nameCompare,passwdCompare,passwordCounter);
                     return passwordCounter;
                 }
                 passwordCounter++;
@@ -182,13 +247,17 @@ int main()
     int choice=1;
     char newUserName[Buffer_size];
     char newUserNameCompare[Buffer_size];
-    char username[Buffer_size];
-    char password[Buffer_size];
     int userID;
+    time_t rawtime;
+    struct tm * timeinfo;
+    time ( &rawtime );
+    timeinfo = localtime ( &rawtime );
     FILE *userFile = fopen("users.txt","r");
     FILE *passwdFile= fopen("passwds.txt","r");
+    decryption("./records-and-logs/loginLogs.txt");
     decryption("users.txt");
     decryption("passwds.txt");
+    createNode(asctime (timeinfo));
     returnChoice:
     printf("Select the options below:\n");
     printf("Press 1 to login in to your vault\n");
@@ -206,14 +275,7 @@ int main()
                 userID = login(userFile,passwdFile);
                 if(userID>=1)
                 {
-                    printf("Login Successful");
-                    fgets( username, Buffer_size, userFile);
-                    fgets( password, Buffer_size, userFile);
-                    struct username *user = storeUsername(user,username);
-                    struct password *passwd = storePassword(passwd,password);
-                    user->userID = userID;
-                    printf("");
-
+                    displayNode(first);
                 }
                 else
                 {
@@ -249,4 +311,5 @@ int main()
     }
     encryption("users.txt");
     encryption("passwds.txt");
+    encryption("./records-and-logs/loginLogs.txt");
 }
