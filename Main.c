@@ -179,8 +179,8 @@ void storeLog(char username [], char password[], int userID)
     struct username *user = storeUsername(user,username);
     struct password *passwd = storePassword(passwd,password);
     user->userID = userID;
-    printf("Login Successful");
-    printf("\n Welcome %s",user->userNameAttempt);
+    printf("Login Successful \n");
+    printf("Welcome %s \n",user->userNameAttempt);
     insertionNode(first,username);
 }
 int login(FILE *userFile,FILE *passwdFile)
@@ -245,15 +245,17 @@ void newVault(char dataToAppend[])
 int main()
 {
     int choice=1;
+    int innerChoice;
     char newUserName[Buffer_size];
     char newUserNameCompare[Buffer_size];
+    char fileName[Buffer_size];
     int userID;
     time_t rawtime;
     struct tm * timeinfo;
     time ( &rawtime );
     timeinfo = localtime ( &rawtime );
     FILE *userFile = fopen("users.txt","r");
-    FILE *passwdFile= fopen("passwds.txt","r");
+    FILE *passwdFile = fopen("passwds.txt","r");
     decryption("./records-and-logs/loginLogs.txt");
     decryption("users.txt");
     decryption("passwds.txt");
@@ -262,6 +264,7 @@ int main()
     printf("Select the options below:\n");
     printf("Press 1 to login in to your vault\n");
     printf("Press 2 to create a new vault\n");
+    // scanf("%d",&choice);
     switch(choice){
         case 1:
                 freopen("users.txt","r",userFile);
@@ -276,6 +279,17 @@ int main()
                 if(userID>=1)
                 {
                     displayNode(first);
+                    printf("Enter the choices below:\n");
+                    printf("Press 1 to make an entry\n");
+                    printf("Press 2 to display all the entries\n");
+                    printf("Press 3 to delete an entry\n");
+                    printf("Press 4 to generate a random password\n");
+                    printf("Press 5 to edit a record\n");
+                    // scanf("%d",&innerChoice);
+                    switch (innerChoice)
+                    {
+             
+                    }
                 }
                 else
                 {
@@ -305,6 +319,9 @@ int main()
                     }
                 }
                 newVault(newUserName);
+                // strcpy(fileName,strcat(newUserName,".txt"));
+                // FILE *newRecordCreate = fopen(strcat(newUserName,".txt"),"r");
+                // fclose(newRecordCreate);
                 fclose(userFile);
                 fclose(passwdFile);
                 break;
@@ -312,4 +329,5 @@ int main()
     encryption("users.txt");
     encryption("passwds.txt");
     encryption("./records-and-logs/loginLogs.txt");
+    free(first);
 }
