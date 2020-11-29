@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include <time.h>
-#define Buffer_size 100 
+#define Buffer_size 100
 
 struct username
 {
@@ -187,19 +187,21 @@ int login(FILE *userFile,FILE *passwdFile)
 {
     printf("Hey, you need to enter your username and password\nUsername: ");
     char nameEntered[Buffer_size];
+    // nameEntered[0] = '\n';
     char passwdEntered[Buffer_size];
+    // passwdEntered[0] = '\n';
     int userCounter = 1;
     int passwordCounter = 1;
-    scanf("%[^\n]%*c",nameEntered);
+    scanf("%s",nameEntered);
     char nameCompare[Buffer_size]; 
     char passwdCompare[Buffer_size];
-    while(fgets(nameCompare, Buffer_size, userFile)!= NULL )
+    while(fgets(nameCompare, Buffer_size, userFile)!= NULL)
     {
         nameCompare[strlen(nameEntered)] = '\0';
         if(strcmp(nameEntered,nameCompare)==0)
         {
             printf("Enter your password: ");
-            scanf("%[^\n]%*c",passwdEntered);
+            scanf("%s",passwdEntered);
             while(fgets(passwdCompare, Buffer_size, passwdFile)!= NULL)
             {
                 passwdCompare[strlen(passwdEntered)] = '\0';
@@ -222,6 +224,7 @@ int login(FILE *userFile,FILE *passwdFile)
 void newVault(char dataToAppend[])
 {
     char dataToAppendPasswd[Buffer_size];
+    // dataToAppendPasswd[0] = '\n';
     FILE *appendUser = fopen("users.txt", "a");
     FILE *appendPasswd = fopen("passwds.txt","a");
     if (appendUser == NULL) 
@@ -233,8 +236,10 @@ void newVault(char dataToAppend[])
     dataToAppend[strlen(dataToAppend)] ='\n';
     fputs(dataToAppend, appendUser);
     printf("Enter the password:\n");
-    fflush(stdin);
-    fgets(dataToAppendPasswd,Buffer_size,stdin);
+    // fflush(stdin);
+    // fgets(dataToAppendPasswd,Buffer_size,stdin);
+    scanf("%s",dataToAppendPasswd);
+    dataToAppendPasswd[strlen(dataToAppendPasswd)] = '\n';
     fputs(dataToAppendPasswd,appendPasswd);
     printf("New vault has been created\n");
     printf("Login again to input entries into your vault\n");
@@ -244,9 +249,10 @@ void newVault(char dataToAppend[])
 
 int main()
 {
-    int choice=1;
+    int choice;
     int innerChoice;
     char newUserName[Buffer_size];
+    // newUserName[0] = '\n';
     char newUserNameCompare[Buffer_size];
     char fileName[Buffer_size];
     int userID;
@@ -264,7 +270,7 @@ int main()
     printf("Select the options below:\n");
     printf("Press 1 to login in to your vault\n");
     printf("Press 2 to create a new vault\n");
-    // scanf("%d",&choice);
+    scanf("%d",&choice);
     switch(choice){
         case 1:
                 freopen("users.txt","r",userFile);
@@ -307,7 +313,7 @@ int main()
                 freopen("passwds.txt","r",passwdFile);
                 reUsername:
                 printf("Enter your new Username to create a vault:\nUsername: ");
-                scanf("%[^\n]%*c",newUserName);
+                scanf("%s",newUserName);
                 while(fgets(newUserNameCompare, Buffer_size, userFile)!= NULL)
                 {
                     newUserNameCompare[strlen(newUserName)] = '\0';
@@ -320,7 +326,7 @@ int main()
                 }
                 newVault(newUserName);
                 // strcpy(fileName,strcat(newUserName,".txt"));
-                // FILE *newRecordCreate = fopen(strcat(newUserName,".txt"),"r");
+                // FILE *newRecordCreate = fopen(newUserName,"r");
                 // fclose(newRecordCreate);
                 fclose(userFile);
                 fclose(passwdFile);
